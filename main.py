@@ -46,9 +46,9 @@ def variableReplace(tokens, operators, variables):
 def evaluate(tokens, variables):
 
 
-    # prevNum = None
-    # currentNum = None
-    # currentOp = None
+#Need to add logic to check for parentheses 
+
+
 
     if '=' in tokens:
         rhsTokens = tokens[2:]
