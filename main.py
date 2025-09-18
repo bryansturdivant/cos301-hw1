@@ -8,9 +8,26 @@ def tokenize(strippedStuff):
     tokenList = []
     lhsVariable = None
     numBuffer = ""
-    for x in strippedStuff:
+
+
+        
+
+
+    for i, x in enumerate(strippedStuff):
         if x.isdigit():
             numBuffer += x
+        #This is where I'm checking for a negative number 
+        elif x == '-':
+            if(i == 0 or strippedStuff[i-1] in OPERATORS and strippedStuff[i-1] != ')'):
+                numBuffer += '-' #start the negative number 
+            
+            else:
+                if numBuffer != "":
+                    tokenList.append(int(numBuffer))
+                    numBuffer = ""
+                tokenList.append(x)
+
+        
         else:
             if numBuffer != "":
                 tokenList.append(int(numBuffer))
@@ -28,6 +45,22 @@ def tokenize(strippedStuff):
     print(lhsVariable)
 
     return tokenList, lhsVariable
+
+def normalize(tokens):
+    i = 0
+    while i < len(tokens) -1:
+        if tokens[i] == '-' and tokens[i+1] == '-':
+            tokens[i:i+2] = ['+']
+        elif tokens[i] == '+' and tokens[i+1] == '+':
+            tokens[i:i+2] = ['+']
+        elif tokens[i] == '+' and tokens[i+1] == '-':
+            tokens[i:i+2] = ['-']
+        elif tokens[i] == '-' and tokens[i+1] == '+':
+            tokens[i:i+2] = ['-']
+        else:
+            i+=1
+
+    return tokens
 
 def variableReplace(tokens, operators, variables):
     if '=' in tokens:
@@ -56,6 +89,22 @@ def evaluate(tokens, variables):
     else:
         lhsVariable = None
         rhsTokens = tokens[:]
+
+    while '(' in rhsTokens:
+        openParent = None
+        for i, token in enumerate(rhsTokens):
+            if token == '(':
+                openParent = i
+            elif token == ')' and openParent is not None:
+                closedParent = i
+
+                innerTokens = rhsTokens[openParent+1:closedParent]
+                innerResult = evaluate(innerTokens, variables)
+                rhsTokens[openParent:closedParent+1] = [innerResult]
+                break
+#everything works after this 
+
+
 
     i = 1
     while i < len(rhsTokens) -1: #i is the operator, i-1 is the previous number, i+1 is the current nubmber
@@ -93,6 +142,7 @@ while True:
     stuff = input("Enter an expression")
     strippedStuff = stuff.replace(" ", "")
     tokens, lhsVariable = tokenize(strippedStuff)
+    tokens = normalize(tokens)
 
     tokens = variableReplace(tokens, OPERATORS, variables)
     finalValue = evaluate(tokens, variables)
