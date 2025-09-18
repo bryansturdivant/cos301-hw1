@@ -7,21 +7,24 @@ def tokenize(strippedStuff):
     i = 0
     tokenList = []
     lhsVariable = None
+    numBuffer = ""
     for x in strippedStuff:
-        tokenList.append(x)
-        try:
-            tokenList[i] = int(tokenList[i])
-        except:
+        if x.isdigit():
+            numBuffer += x
+        else:
+            if numBuffer != "":
+                tokenList.append(int(numBuffer))
+                numBuffer = ""
+            tokenList.append(x)
 
 
-            print("Not an int") 
+    if numBuffer != "":
+        tokenList.append(int(numBuffer))
 
-        # print(type(tokenList[i]))
-        i += 1
-
-    print(tokenList)
     if '=' in tokenList:
         lhsVariable = tokenList[0]
+    
+    print(tokenList)
     print(lhsVariable)
 
     return tokenList, lhsVariable
@@ -41,47 +44,44 @@ def variableReplace(tokens, operators, variables):
     return tokens
 
 def evaluate(tokens, variables):
-    value = 0
-    currentNum = None
-    currentOp = None
+
+
+    # prevNum = None
+    # currentNum = None
+    # currentOp = None
+
     if '=' in tokens:
         rhsTokens = tokens[2:]
         lhsVariable = tokens[0]
-        value = rhsTokens[0]
-        for x in range(1, len(rhsTokens), 2):
-            currentOp = rhsTokens[x]
-            currentNum = rhsTokens[x+1]
-            if currentOp == '+':
-                value = value + currentNum
-            elif currentOp == '-':
-                value = value - currentNum
-            elif currentOp == '/':
-                value = value/currentNum
-            elif currentOp == '*':
-                value = value*currentNum
-        variables[lhsVariable] = value
-        print("updated variable")
     else:
-        rhsTokens = tokens[0:]
-        value = rhsTokens[0]
-        for x in range(1, len(rhsTokens), 2):
-            currentOp = rhsTokens[x]
-            currentNum = rhsTokens[x+1]
-            if currentOp == '+':
-                value = value + currentNum
-            elif currentOp == '-':
-                value = value - currentNum
-            elif currentOp == '/':
-                value = value/currentNum
-            elif currentOp == '*':
-                value = value*currentNum
+        lhsVariable = None
+        rhsTokens = tokens[:]
 
-        print(f"Value is {value}")
-        
-            
+    i = 1
+    while i < len(rhsTokens) -1: #i is the operator, i-1 is the previous number, i+1 is the current nubmber
+        if rhsTokens[i] == '*':
+            result = rhsTokens[i-1] * rhsTokens[i+1]
+            rhsTokens[i-1:i+2] = [result]
+        elif rhsTokens[i] == '/':
+            result = rhsTokens[i-1]/ rhsTokens[i+1]
+            rhsTokens[i-1:i+2] = [result]
+        else:
+            i+=2
+    i = 1
+    while i < len(rhsTokens) - 1:
+        if rhsTokens[i] == '+':
+            result = rhsTokens[i-1] + rhsTokens[i+1]
+            rhsTokens[i-1:i+2] = [result]
+        elif rhsTokens[i] == '-':
+            result = rhsTokens[i-1] - rhsTokens[i+1]
+            rhsTokens[i-1:i+2] = [result]
+    
+    finalValue = rhsTokens[0] #This should be the final value
+    print(f'Final value is {finalValue}')
 
-
-
+    if lhsVariable:
+        variables[lhsVariable] = finalValue
+    return finalValue
 
 
 
@@ -95,8 +95,8 @@ while True:
     tokens, lhsVariable = tokenize(strippedStuff)
 
     tokens = variableReplace(tokens, OPERATORS, variables)
-    evaluate(tokens, variables)
-
+    finalValue = evaluate(tokens, variables)
+    print(finalValue)
     print(f"Tokens are: {tokens}")
     print(f"Variables are {variables}")
 
