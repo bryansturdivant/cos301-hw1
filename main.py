@@ -35,9 +35,6 @@ def tokenize(strippedStuff):
     if '=' in tokenList:
         lhsVariable = tokenList[0]
 
-    # print(tokenList)
-    # print(lhsVariable)
-
     return tokenList, lhsVariable
 
 
@@ -72,10 +69,26 @@ def variableReplace(tokens, operators, variables):
 
     return tokens
 
+def insertMultiplication(tokens):
+    i = 0
+
+    while i < len(tokens) -1:
+        if tokens[i] == '(' and i > 0 and type(tokens[i-1]) == int:
+            tokens.insert(i,'*')
+            i+=1
+            
+        elif tokens[i] == ')' and type(tokens[i+1]) == int:
+            tokens.insert(i+1, '*')
+            i+=1
+            
+        elif tokens[i] == ')' and i+1 < len(tokens) and tokens[i+1] == '(':
+            tokens.insert(i+1, '*')
+            i+=1
+        else:
+            i+=1
+    return tokens
 
 def evaluate(tokens, variables):
-
-    # Need to add logic to check for parentheses
 
     if '=' in tokens:
         rhsTokens = tokens[2:]
@@ -96,7 +109,7 @@ def evaluate(tokens, variables):
                 innerResult = evaluate(innerTokens, variables)
                 rhsTokens[openParent:closedParent+1] = [innerResult]
                 break
-# everything works after this
+
 
     i = 1
     # i is the operator, i-1 is the previous number, i+1 is the current nubmber
@@ -119,25 +132,39 @@ def evaluate(tokens, variables):
             rhsTokens[i-1:i+2] = [result]
 
     finalValue = rhsTokens[0]  # This should be the final value
-    # print(f'Final value is {finalValue}')
+
 
     if lhsVariable:
         variables[lhsVariable] = finalValue
-    else:
-        if type(finalValue) == int:
-            print(finalValue)
+    # else:
+    #     if type(finalValue) == int and len(rhsTokens) == 1:
+    #         print(finalValue)
 
     return finalValue
 
 
 while True:
-    stuff = input("Enter an expression")
+    stuff = input("")
     strippedStuff = stuff.replace(" ", "")
+
+    if strippedStuff == '':
+        print("")
+        continue
+
     tokens, lhsVariable = tokenize(strippedStuff)
     tokens = normalize(tokens)
-
+    tokens = insertMultiplication(tokens)
     tokens = variableReplace(tokens, OPERATORS, variables)
     finalValue = evaluate(tokens, variables)
-    # print(finalValue)
-    # print(f"Tokens are: {tokens}")
-    # print(f"Variables are {variables}")
+
+    if '=' in tokens:
+        continue
+
+    elif len(tokens) == 1 and type(tokens[0]) is int and tokens[0] in variables:
+        print(variables[tokens[0]])
+    else:
+        print(finalValue)
+
+
+
+

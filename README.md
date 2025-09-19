@@ -19,12 +19,13 @@ Manifest:
     output: //blank// but will store the result of x in a variable dictionary
     input: x
     output: 7
+    input: 
+    output: 
+
 
 Bugs and Limitations:
 
--Tested and works as wanted as far as I am aware. 
-
--At the moment, just parentheses will not do multiplication 
+-Tested and works as wanted as far as I am aware with the testing that I have done. 
 
 Resources used:
 
