@@ -9,46 +9,41 @@ def tokenize(strippedStuff):
     lhsVariable = None
     numBuffer = ""
 
-
-        
-
-
     for i, x in enumerate(strippedStuff):
         if x.isdigit():
             numBuffer += x
-        #This is where I'm checking for a negative number 
+        # This is where I'm checking for a negative number
         elif x == '-':
-            if(i == 0 or strippedStuff[i-1] in OPERATORS and strippedStuff[i-1] != ')'):
-                numBuffer += '-' #start the negative number 
-            
+            if (i == 0 or strippedStuff[i-1] in OPERATORS and strippedStuff[i-1] != ')'):
+                numBuffer += '-'  # start the negative number
+
             else:
                 if numBuffer != "":
                     tokenList.append(int(numBuffer))
                     numBuffer = ""
                 tokenList.append(x)
 
-        
         else:
             if numBuffer != "":
                 tokenList.append(int(numBuffer))
                 numBuffer = ""
             tokenList.append(x)
 
-
     if numBuffer != "":
         tokenList.append(int(numBuffer))
 
     if '=' in tokenList:
         lhsVariable = tokenList[0]
-    
-    print(tokenList)
-    print(lhsVariable)
+
+    # print(tokenList)
+    # print(lhsVariable)
 
     return tokenList, lhsVariable
 
+
 def normalize(tokens):
     i = 0
-    while i < len(tokens) -1:
+    while i < len(tokens) - 1:
         if tokens[i] == '-' and tokens[i+1] == '-':
             tokens[i:i+2] = ['+']
         elif tokens[i] == '+' and tokens[i+1] == '+':
@@ -58,9 +53,10 @@ def normalize(tokens):
         elif tokens[i] == '-' and tokens[i+1] == '+':
             tokens[i:i+2] = ['-']
         else:
-            i+=1
+            i += 1
 
     return tokens
+
 
 def variableReplace(tokens, operators, variables):
     if '=' in tokens:
@@ -76,12 +72,10 @@ def variableReplace(tokens, operators, variables):
 
     return tokens
 
+
 def evaluate(tokens, variables):
 
-
-#Need to add logic to check for parentheses 
-
-
+    # Need to add logic to check for parentheses
 
     if '=' in tokens:
         rhsTokens = tokens[2:]
@@ -102,20 +96,19 @@ def evaluate(tokens, variables):
                 innerResult = evaluate(innerTokens, variables)
                 rhsTokens[openParent:closedParent+1] = [innerResult]
                 break
-#everything works after this 
-
-
+# everything works after this
 
     i = 1
-    while i < len(rhsTokens) -1: #i is the operator, i-1 is the previous number, i+1 is the current nubmber
+    # i is the operator, i-1 is the previous number, i+1 is the current nubmber
+    while i < len(rhsTokens) - 1:
         if rhsTokens[i] == '*':
             result = rhsTokens[i-1] * rhsTokens[i+1]
             rhsTokens[i-1:i+2] = [result]
         elif rhsTokens[i] == '/':
-            result = rhsTokens[i-1]/ rhsTokens[i+1]
+            result = rhsTokens[i-1] / rhsTokens[i+1]
             rhsTokens[i-1:i+2] = [result]
         else:
-            i+=2
+            i += 2
     i = 1
     while i < len(rhsTokens) - 1:
         if rhsTokens[i] == '+':
@@ -124,18 +117,17 @@ def evaluate(tokens, variables):
         elif rhsTokens[i] == '-':
             result = rhsTokens[i-1] - rhsTokens[i+1]
             rhsTokens[i-1:i+2] = [result]
-    
-    finalValue = rhsTokens[0] #This should be the final value
-    print(f'Final value is {finalValue}')
+
+    finalValue = rhsTokens[0]  # This should be the final value
+    # print(f'Final value is {finalValue}')
 
     if lhsVariable:
         variables[lhsVariable] = finalValue
+    else:
+        if type(finalValue) == int:
+            print(finalValue)
+
     return finalValue
-
-
-
-
-
 
 
 while True:
@@ -146,12 +138,6 @@ while True:
 
     tokens = variableReplace(tokens, OPERATORS, variables)
     finalValue = evaluate(tokens, variables)
-    print(finalValue)
-    print(f"Tokens are: {tokens}")
-    print(f"Variables are {variables}")
-
-
-
-    
-
-
+    # print(finalValue)
+    # print(f"Tokens are: {tokens}")
+    # print(f"Variables are {variables}")
