@@ -69,24 +69,6 @@ def variableReplace(tokens, operators, variables):
 
     return tokens
 
-def insertMultiplication(tokens):
-    i = 0
-
-    while i < len(tokens) -1:
-        if tokens[i] == '(' and i > 0 and type(tokens[i-1]) == int:
-            tokens.insert(i,'*')
-            i+=1
-            
-        elif tokens[i] == ')' and type(tokens[i+1]) == int:
-            tokens.insert(i+1, '*')
-            i+=1
-            
-        elif tokens[i] == ')' and i+1 < len(tokens) and tokens[i+1] == '(':
-            tokens.insert(i+1, '*')
-            i+=1
-        else:
-            i+=1
-    return tokens
 
 def evaluate(tokens, variables):
 
@@ -111,17 +93,8 @@ def evaluate(tokens, variables):
                 break
 
 
-    i = 1
+
     # i is the operator, i-1 is the previous number, i+1 is the current nubmber
-    while i < len(rhsTokens) - 1:
-        if rhsTokens[i] == '*':
-            result = rhsTokens[i-1] * rhsTokens[i+1]
-            rhsTokens[i-1:i+2] = [result]
-        elif rhsTokens[i] == '/':
-            result = rhsTokens[i-1] / rhsTokens[i+1]
-            rhsTokens[i-1:i+2] = [result]
-        else:
-            i += 2
     i = 1
     while i < len(rhsTokens) - 1:
         if rhsTokens[i] == '+':
@@ -153,7 +126,6 @@ while True:
 
     tokens, lhsVariable = tokenize(strippedStuff)
     tokens = normalize(tokens)
-    tokens = insertMultiplication(tokens)
     tokens = variableReplace(tokens, OPERATORS, variables)
     finalValue = evaluate(tokens, variables)
 
